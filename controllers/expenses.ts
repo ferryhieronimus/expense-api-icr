@@ -7,7 +7,34 @@ import { v4 as uuidv4 } from "uuid";
 
 // get all expenses
 const getAllExpenses: RequestHandler = (req, res) => {
-  res.json(expenses).status(200);
+  const params = req.query as {
+    category_id: string;
+    min_price: string;
+    max_price: string;
+  };
+
+  let returnedExpenses = expenses.slice();
+
+  const categoriesId = params.category_id?.split(",");
+  const minPrice = parseInt(params.min_price);
+  const maxPrice = parseInt(params.max_price);
+
+  if (categoriesId) {
+    const categoryNameIdMap: Record<string, string> = {};
+    categories.forEach((c) => (categoryNameIdMap[c.name] = c.id));
+
+    returnedExpenses = returnedExpenses.filter((exp) =>
+      categoriesId.includes(categoryNameIdMap[exp.category])
+    );
+  }
+  if (minPrice) {
+    returnedExpenses = returnedExpenses.filter((exp) => exp.amount >= minPrice);
+  }
+  if (maxPrice) {
+    returnedExpenses = returnedExpenses.filter((exp) => exp.amount <= maxPrice);
+  }
+
+  res.json(returnedExpenses).status(200);
 };
 
 // get categories
