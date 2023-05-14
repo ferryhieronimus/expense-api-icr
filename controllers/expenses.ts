@@ -1,7 +1,6 @@
 import { RequestHandler } from "express";
 import { expenses } from "../seeds/expenses";
 import { categories } from "../seeds/category";
-import { totalExpenses } from "../seeds/totalExpenses";
 import { expenseSchema } from "../schemas/expense";
 import { v4 as uuidv4 } from "uuid";
 
@@ -44,7 +43,11 @@ const getAllCategories: RequestHandler = (req, res) => {
 
 // get total expenses
 const getTotalExpenses: RequestHandler = (req, res) => {
-  res.json(totalExpenses).status(200);
+  const totalAmount = expenses.reduce(
+    (accumulator, expense) => accumulator + expense.amount, 0
+  );
+  const response = {"total_expense": totalAmount}
+  res.json(response).status(200);
 };
 
 // get expense by id
